@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Streaming Demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>Streaming demo</h1>
+    <nav><a href="help.html">Help: what are these?</a></nav>
+  </header>
+
+  <div class="controls">
+    <label for="transport">Transport</label>
+    <select id="transport">
+      <option value="polling">Short polling</option>
+      <option value="longpolling">Long polling</option>
+      <option value="sse" selected>Server-Sent Events (SSE)</option>
+      <option value="ndjson">HTTP streaming (NDJSON)</option>
+      <option value="websocket">WebSocket</option>
+    </select>
+    <button type="button" id="reset" class="danger"
+            title="Delete all messages and zero all statistics. Every open tab starts fresh.">Reset</button>
+  </div>
+  <div id="hint" class="muted"></div>
+
+  <form id="form">
+    <input id="text" type="text" maxlength="1000" placeholder="Type a message..." autocomplete="off" required>
+    <button type="submit">Send</button>
+  </form>
+  <div id="error"></div>
+  <div id="sendvia" class="muted"></div>
+
+  <div class="panels">
+    <section class="panel">
+      <h3>This page (measured in your browser)</h3>
+      <table>
+        <tr><td>State</td><td class="num" id="s-state">-</td></tr>
+        <tr><td>Connected for</td><td class="num" id="s-up">-</td></tr>
+        <tr><td>HTTP requests made</td><td class="num" id="s-req">0</td></tr>
+        <tr><td>Reconnects / errors</td><td class="num" id="s-recon">0</td></tr>
+        <tr><td>Messages received</td><td class="num" id="s-msgs">0</td></tr>
+        <tr><td>Body bytes received</td><td class="num" id="s-bytes">0</td></tr>
+        <tr><td>Last delivery delay</td><td class="num" id="s-last">-</td></tr>
+        <tr><td>Average delivery delay</td><td class="num" id="s-avg">-</td></tr>
+      </table>
+      <p class="muted">
+        Delay = browser clock minus the message's server timestamp, for messages created after you connected.
+        Bytes count only response bodies (SSE: the <code>data:</code> part), not HTTP headers.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h3>Server (all open tabs)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Transport</th>
+            <th class="num" title="Connections open on the server at this moment (a held long-poll request counts too)">Connection Open</th>
+            <th class="num" title="HTTP requests received since start or last Reset: one per poll, one per stream or WebSocket connection">HTTP Requests</th>
+            <th class="num" title="Messages the server has pushed out, counted once per receiving client">Messages Delivered</th>
+          </tr>
+        </thead>
+        <tbody id="server-stats"></tbody>
+      </table>
+      <p class="muted">
+        <strong>Connection Open</strong>: connections open at this moment.
+        <strong>HTTP Requests</strong>: requests received so far (polling keeps adding; streams add one per connection).
+        <strong>Messages Delivered</strong>: messages pushed out, once per receiving client.
+        Open another tab on a different transport and send a message: both receive it.
+      </p>
+    </section>
+  </div>
+
+  <h3>Messages</h3>
+  <ul id="messages"></ul>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
